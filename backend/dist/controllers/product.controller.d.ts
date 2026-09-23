@@ -1,0 +1,28 @@
+import { Request, Response } from "express";
+export declare const createProduct: (req: Request, res: Response) => Promise<Response>;
+export declare const getProducts: (req: Request, res: Response) => Promise<Response>;
+export declare const getProductById: (req: Request, res: Response) => Promise<Response>;
+export declare const updateProduct: (req: Request, res: Response) => Promise<Response>;
+export declare const updateProductStatus: (req: Request, res: Response) => Promise<Response>;
+export declare const deleteProduct: (req: Request, res: Response) => Promise<Response>;
+export declare const duplicateProduct: (req: Request, res: Response) => Promise<Response>;
+export declare const bulkUpdateStatus: (req: Request, res: Response) => Promise<Response>;
+export declare const bulkUpdatePublish: (req: Request, res: Response) => Promise<Response>;
+export declare const bulkDelete: (req: Request, res: Response) => Promise<Response>;
+export declare const getProductOrders: (req: Request, res: Response) => Promise<Response>;
+export declare const getProductStats: (req: Request, res: Response) => Promise<Response>;
+declare const _default: {
+    createProduct: typeof createProduct;
+    getProducts: typeof getProducts;
+    getProductById: typeof getProductById;
+    updateProduct: typeof updateProduct;
+    updateProductStatus: typeof updateProductStatus;
+    duplicateProduct: typeof duplicateProduct;
+    bulkUpdateStatus: typeof bulkUpdateStatus;
+    bulkUpdatePublish: typeof bulkUpdatePublish;
+    bulkDelete: typeof bulkDelete;
+    getProductOrders: typeof getProductOrders;
+    getProductStats: typeof getProductStats;
+    deleteProduct: typeof deleteProduct;
+};
+export default _default;

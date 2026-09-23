@@ -1,0 +1,74 @@
+import { Document, Model, Types } from "mongoose";
+export interface IVendorDocument {
+    id: string;
+    type: "PAN Card" | "GST Certificate" | "Business Registration" | "Address Proof" | "Bank Proof" | "Owner ID" | "Other" | string;
+    documentNumber: string;
+    fileName: string;
+    fileSize: string;
+    fileUrl: string;
+    uploadedDate: string;
+    expiryDate?: string | null;
+    status: "Pending" | "Verified" | "Rejected" | "Expired" | string;
+    verifiedDate?: string | null;
+    verifiedBy?: string | null;
+    rejectionReason?: string | null;
+    notes?: string;
+    [key: string]: any;
+}
+export interface IVendor extends Document {
+    vendorId: string;
+    businessName: string;
+    ownerName: string;
+    businessType: "Individual" | "Partnership" | "Private Limited" | "Public Limited" | "LLP" | "Proprietorship" | string;
+    email: string;
+    phone: string;
+    avatar?: string;
+    banner?: string;
+    website?: string;
+    description?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    pincode?: string;
+    address?: string | any;
+    taxInfo?: {
+        gstNumber?: string;
+        panNumber?: string;
+        taxIdentificationNumber?: string;
+        taxType?: string;
+        [key: string]: any;
+    };
+    bankInfo?: {
+        accountHolder?: string;
+        accountHolderName?: string;
+        accountNumber?: string;
+        bankName?: string;
+        branch?: string;
+        branchName?: string;
+        ifsc?: string;
+        ifscCode?: string;
+        upiId?: string;
+        [key: string]: any;
+    };
+    status: "Pending" | "Under Review" | "Approved" | "Rejected" | "Suspended" | "Inactive" | string;
+    kycStatus: "Pending" | "Under Review" | "Verified" | "Rejected" | string;
+    statusReason?: string;
+    kycNotes?: string;
+    documentsStatus?: "Pending" | "Under Review" | "Verified" | "Rejected" | "Partial" | "Complete" | "Action Required" | string;
+    commissionRate: number;
+    featured: boolean;
+    softDeleted: boolean;
+    rating?: number;
+    ratingCount?: number;
+    totalOrders?: number;
+    totalSales?: number;
+    registrationDate?: string | Date;
+    documents: IVendorDocument[];
+    createdBy?: Types.ObjectId | null;
+    updatedBy?: Types.ObjectId | null;
+    createdAt: Date;
+    updatedAt: Date;
+    [key: string]: any;
+}
+export declare const Vendor: Model<IVendor>;
+export default Vendor;

@@ -1,0 +1,20 @@
+import { Request, Response } from "express";
+export declare const getSalesOverview: (req: Request, res: Response) => Promise<Response>;
+export declare const getSalesMetrics: (req: Request, res: Response) => Promise<Response>;
+export declare const getSalesChart: (req: Request, res: Response) => Promise<Response>;
+export declare const getSalesChannels: (req: Request, res: Response) => Promise<Response>;
+export declare const getTopProducts: (req: Request, res: Response) => Promise<Response>;
+export declare const getCustomerMix: (req: Request, res: Response) => Promise<Response>;
+export declare const getSalesTransactions: (req: Request, res: Response) => Promise<Response>;
+export declare const exportSalesReport: (req: Request, res: Response) => Promise<any>;
+declare const _default: {
+    getSalesOverview: typeof getSalesOverview;
+    getSalesMetrics: typeof getSalesMetrics;
+    getSalesChart: typeof getSalesChart;
+    getSalesChannels: typeof getSalesChannels;
+    getTopProducts: typeof getTopProducts;
+    getCustomerMix: typeof getCustomerMix;
+    getSalesTransactions: typeof getSalesTransactions;
+    exportSalesReport: typeof exportSalesReport;
+};
+export default _default;

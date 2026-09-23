@@ -1,0 +1,523 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const platform_controller_1 = require("../controllers/platform.controller");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const permissionMiddleware_1 = __importDefault(require("../middleware/permissionMiddleware"));
+const router = (0, express_1.Router)();
+/**
+ * @swagger
+ * tags:
+ *   name: Platform
+ *   description: B2C Control Centre operations, promotional coupons, payments, customer reviews, and support tickets
+ */
+// -----------------------------------------------------
+// 1. OVERVIEW
+// -----------------------------------------------------
+/**
+ * @swagger
+ * /api/platform/overview:
+ *   get:
+ *     summary: Get B2C Control Centre overview
+ *     description: Retrieve executive metrics (revenue today, orders today, new B2C users, conversion rate), recent transactions, active offers, review feed, and support tickets.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Control Centre overview retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.get("/overview", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getPlatformOverviewHandler);
+// -----------------------------------------------------
+// 2. OFFERS & COUPONS
+// -----------------------------------------------------
+/**
+ * @swagger
+ * /api/platform/offers:
+ *   get:
+ *     summary: Get promotional offers & coupons
+ *     description: Retrieve list of discount codes and campaigns with tab status and search filtering.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: tab
+ *         schema:
+ *           type: string
+ *           enum: [All, Active, Scheduled, Expired]
+ *         description: Filter by campaign lifecycle status
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by coupon code or title
+ *     responses:
+ *       200:
+ *         description: Offers retrieved successfully
+ */
+router.get("/offers", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getOffersHandler);
+/**
+ * @swagger
+ * /api/platform/offers/{id}:
+ *   get:
+ *     summary: Get offer by ID
+ *     description: Retrieve single offer details by ID.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Offer details retrieved successfully
+ *       404:
+ *         description: Offer not found
+ */
+router.get("/offers/:id", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getOfferByIdHandler);
+/**
+ * @swagger
+ * /api/platform/offers:
+ *   post:
+ *     summary: Create new promotional offer
+ *     description: Add a new discount campaign, coupon code, or BOGO promotion.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - code
+ *               - title
+ *               - value
+ *             properties:
+ *               code:
+ *                 type: string
+ *                 example: FESTIVE30
+ *               title:
+ *                 type: string
+ *                 example: Festive season 30% off
+ *               type:
+ *                 type: string
+ *                 enum: [Percent, Flat, Free shipping, BOGO]
+ *                 example: Percent
+ *               value:
+ *                 type: string
+ *                 example: 30%
+ *               minOrder:
+ *                 type: number
+ *                 example: 999
+ *               limit:
+ *                 type: number
+ *                 example: 2500
+ *               status:
+ *                 type: string
+ *                 enum: [Active, Scheduled, Expired]
+ *                 example: Active
+ *               window:
+ *                 type: string
+ *                 example: 01 – 31 Oct 2026
+ *               audience:
+ *                 type: string
+ *                 example: All customers
+ *     responses:
+ *       201:
+ *         description: Offer created successfully
+ *       400:
+ *         description: Bad request or duplicate code
+ */
+router.post("/offers", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.create"), platform_controller_1.createOfferHandler);
+/**
+ * @swagger
+ * /api/platform/offers/{id}:
+ *   put:
+ *     summary: Update offer
+ *     description: Update an existing promotional campaign by ID.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Offer updated successfully
+ *       404:
+ *         description: Offer not found
+ */
+router.put("/offers/:id", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.update"), platform_controller_1.updateOfferHandler);
+/**
+ * @swagger
+ * /api/platform/offers/{id}:
+ *   delete:
+ *     summary: Delete offer
+ *     description: Soft-delete an existing promotional campaign by ID.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Offer deleted successfully
+ *       404:
+ *         description: Offer not found
+ */
+router.delete("/offers/:id", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.delete"), platform_controller_1.deleteOfferHandler);
+// -----------------------------------------------------
+// 3. PAYMENTS, PAYOUTS & REFUNDS
+// -----------------------------------------------------
+/**
+ * @swagger
+ * /api/platform/payments/transactions:
+ *   get:
+ *     summary: Get B2C payment transactions
+ *     description: Retrieve customer payments, payment gateways, and settlement states.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [All status, Captured, Pending, Refunded, Failed]
+ *       - in: query
+ *         name: method
+ *         schema:
+ *           type: string
+ *           enum: [All methods, UPI, Card, Netbanking, COD, Wallet]
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Payment transactions retrieved successfully
+ */
+router.get("/payments/transactions", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getTransactionsHandler);
+router.get("/transactions", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getTransactionsHandler);
+/**
+ * @swagger
+ * /api/platform/payments/payouts:
+ *   get:
+ *     summary: Get merchant settlement payouts
+ *     description: Retrieve weekly payout batches, fees, refunds, and bank accounts.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Payouts retrieved successfully
+ */
+router.get("/payments/payouts", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getPayoutsHandler);
+router.get("/payouts", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getPayoutsHandler);
+/**
+ * @swagger
+ * /api/platform/payments/refunds:
+ *   get:
+ *     summary: Get customer refunds
+ *     description: Retrieve refund claims, reasons, and settlement status.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Refunds retrieved successfully
+ */
+router.get("/payments/refunds", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getRefundsHandler);
+router.get("/refunds", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getRefundsHandler);
+// -----------------------------------------------------
+// 4. REVIEWS & RATINGS MODERATION
+// -----------------------------------------------------
+/**
+ * @swagger
+ * /api/platform/reviews:
+ *   get:
+ *     summary: Get customer product reviews
+ *     description: List shopper reviews with moderation status filter.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [Pending, Approved, Rejected]
+ *     responses:
+ *       200:
+ *         description: Reviews retrieved successfully
+ */
+router.get("/reviews", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getReviewsHandler);
+/**
+ * @swagger
+ * /api/platform/reviews:
+ *   post:
+ *     summary: Create customer review
+ *     description: Submit a new product review and rating.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - product
+ *               - customer
+ *               - rating
+ *               - text
+ *             properties:
+ *               product:
+ *                 type: string
+ *               customer:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *                 minimum: 1
+ *                 maximum: 5
+ *               text:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Review submitted successfully
+ */
+router.post("/reviews", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.create"), platform_controller_1.createReviewHandler);
+/**
+ * @swagger
+ * /api/platform/reviews/{id}/status:
+ *   put:
+ *     summary: Moderate review status
+ *     description: Approve or reject a customer product review.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [Pending, Approved, Rejected]
+ *     responses:
+ *       200:
+ *         description: Review status updated successfully
+ */
+router.put("/reviews/:id/status", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.update"), platform_controller_1.updateReviewStatusHandler);
+router.patch("/reviews/:id/status", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.update"), platform_controller_1.updateReviewStatusHandler);
+/**
+ * @swagger
+ * /api/platform/reviews/{id}:
+ *   delete:
+ *     summary: Delete review
+ *     description: Remove a customer product review.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Review deleted successfully
+ */
+router.delete("/reviews/:id", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.delete"), platform_controller_1.deleteReviewHandler);
+// -----------------------------------------------------
+// 5. SUPPORT TICKETS
+// -----------------------------------------------------
+/**
+ * @swagger
+ * /api/platform/tickets:
+ *   get:
+ *     summary: Get customer support tickets
+ *     description: Retrieve tickets from customer operations.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [Open, In progress, Resolved, Closed]
+ *     responses:
+ *       200:
+ *         description: Support tickets retrieved successfully
+ */
+router.get("/tickets", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getTicketsHandler);
+/**
+ * @swagger
+ * /api/platform/tickets:
+ *   post:
+ *     summary: Create support ticket
+ *     description: Open a new customer service ticket.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - subject
+ *               - customer
+ *             properties:
+ *               subject:
+ *                 type: string
+ *               customer:
+ *                 type: string
+ *               priority:
+ *                 type: string
+ *                 enum: [High, Medium, Low]
+ *     responses:
+ *       201:
+ *         description: Support ticket created successfully
+ */
+router.post("/tickets", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.create"), platform_controller_1.createTicketHandler);
+/**
+ * @swagger
+ * /api/platform/tickets/{id}/status:
+ *   put:
+ *     summary: Update ticket status
+ *     description: Transition ticket lifecycle state (Open, In progress, Resolved, Closed).
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [Open, In progress, Resolved, Closed]
+ *     responses:
+ *       200:
+ *         description: Ticket status updated successfully
+ */
+router.put("/tickets/:id/status", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.update"), platform_controller_1.updateTicketStatusHandler);
+router.patch("/tickets/:id/status", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.update"), platform_controller_1.updateTicketStatusHandler);
+/**
+ * @swagger
+ * /api/platform/tickets/{id}:
+ *   delete:
+ *     summary: Delete ticket
+ *     description: Remove a support ticket.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Support ticket deleted successfully
+ */
+router.delete("/tickets/:id", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.delete"), platform_controller_1.deleteTicketHandler);
+// -----------------------------------------------------
+// 6. SHIPPING ZONES
+// -----------------------------------------------------
+/**
+ * @swagger
+ * /api/platform/shipping-zones:
+ *   get:
+ *     summary: Get shipping zones and delivery rules
+ *     description: Retrieve active B2C delivery zones, ETAs, and courier partner rules.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Shipping zones retrieved successfully
+ */
+router.get("/shipping-zones", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.read"), platform_controller_1.getShippingZonesHandler);
+/**
+ * @swagger
+ * /api/platform/shipping-zones:
+ *   put:
+ *     summary: Update shipping zones
+ *     description: Replace or configure B2C shipping zones and delivery partner rules.
+ *     tags: [Platform]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - zones
+ *             properties:
+ *               zones:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     zone:
+ *                       type: string
+ *                     rate:
+ *                       type: string
+ *                     eta:
+ *                       type: string
+ *                     partners:
+ *                       type: string
+ *     responses:
+ *       200:
+ *         description: Shipping zones updated successfully
+ */
+router.put("/shipping-zones", authMiddleware_1.protect, (0, permissionMiddleware_1.default)("platform.update"), platform_controller_1.updateShippingZonesHandler);
+exports.default = router;
+//# sourceMappingURL=platform.routes.js.map

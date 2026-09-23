@@ -1,0 +1,20 @@
+import { Request, Response } from "express";
+export declare const getCustomerStatsHandler: (req: Request, res: Response) => Promise<void>;
+export declare const getCustomersHandler: (req: Request, res: Response) => Promise<void>;
+export declare const getCustomerByIdHandler: (req: Request, res: Response) => Promise<void>;
+export declare const getCustomerOrdersHandler: (req: Request, res: Response) => Promise<void>;
+export declare const createCustomerHandler: (req: Request, res: Response) => Promise<void>;
+export declare const updateCustomerHandler: (req: Request, res: Response) => Promise<void>;
+export declare const deleteCustomerHandler: (req: Request, res: Response) => Promise<void>;
+export declare const exportCustomersHandler: (req: Request, res: Response) => Promise<void>;
+declare const _default: {
+    getCustomerStatsHandler: typeof getCustomerStatsHandler;
+    getCustomersHandler: typeof getCustomersHandler;
+    getCustomerByIdHandler: typeof getCustomerByIdHandler;
+    getCustomerOrdersHandler: typeof getCustomerOrdersHandler;
+    createCustomerHandler: typeof createCustomerHandler;
+    updateCustomerHandler: typeof updateCustomerHandler;
+    deleteCustomerHandler: typeof deleteCustomerHandler;
+    exportCustomersHandler: typeof exportCustomersHandler;
+};
+export default _default;
