@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "dev:js": "nodemon src/server.js",
-    "build": "rimraf dist && tsc",
+    "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/seeds/seedAdmin.ts"
