@@ -1,0 +1,14 @@
+- [x] Apply the premium module styling consistently
+- [x] Add real product imagery to product views
+- [x] Add Orders screen and navigation
+- [x] Add Sales screen and navigation
+- [x] Verify desktop and mobile flows
+- [x] Add Customers list and customer detail screens
+- [x] Add CMS management and content detail screens
+- [x] Add working detail views for every module with a View action
+- [x] Verify all new navigation and detail views
+- [x] Forgot password screen
+- [x] Storefront preview screen
+- [x] Richer customer, order, product, CMS and master detail views
+- [x] Orders wired to product pages
+- [x] Edit product reachable from detail views
